@@ -81,8 +81,6 @@ class Inferer:
 
         det[:, :4] = self.rescale(img.shape[2:], det[:, :4], im0.shape).round()
 
-        print(det)
-        
         # Return bounding boxes, scores, and class ids
         bboxes = det[:, :4].cpu().numpy()
         scores = det[:, 4].cpu().numpy()
