@@ -76,20 +76,22 @@ class Inferer:
         
         # Check if det is None or empty
         if det is None or len(det) == 0:
-            return np.array([]), np.array([]), np.array([])
+            print(f"No detections found for current frame")
+            return np.array([]), np.array([])
 
 
         det[:, :4] = self.rescale(img.shape[2:], det[:, :4], im0.shape).round()
 
-        # Return bounding boxes, scores, and class ids
-        bboxes = det[:, :4].cpu().numpy()
-        scores = det[:, 4].cpu().numpy()
-        class_ids = det[:, 5].cpu().numpy()
+        results = []
+        # Combine bounding boxes and scores
+        bboxes_and_scores = torch.cat((det[:, :4], det[:, 4:5]), dim=1).cpu().numpy()  # [x1, y1, x2, y2, score]
+        results.append(bboxes_and_scores)
+        classes = det[:, 5].cpu().numpy()
         # FPS counter
         # fps_calculator.update(1.0 / (t2 - t1))
         # avg_fps = fps_calculator.accumulate()
 
-        return bboxes, scores, class_ids
+        return results, classes
 
 
 
