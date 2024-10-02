@@ -81,10 +81,12 @@ class Inferer:
 
         det[:, :4] = self.rescale(img.shape[2:], det[:, :4], im0.shape).round()
 
+        print(det)
+        
         # Return bounding boxes, scores, and class ids
-        bboxes = det[:, :4]
-        scores = det[:, 4]
-        class_ids = det[:, 5]
+        bboxes = det[:, :4].cpu().numpy()
+        scores = det[:, 4].cpu().numpy()
+        class_ids = det[:, 5].cpu().numpy()
         # FPS counter
         # fps_calculator.update(1.0 / (t2 - t1))
         # avg_fps = fps_calculator.accumulate()
