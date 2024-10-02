@@ -74,18 +74,22 @@ class Inferer:
         # Perform NMS (Non-Max Suppression) to filter the results
         det = non_max_suppression(pred_results, conf_thres, iou_thres, classes, agnostic_nms, max_det=max_det)[0]
         
-        # Process results
-        if det is not None and len(det):
-            det[:, :4] = self.rescale(img.shape[2:], det[:, :4], im0.shape).round()
+        # Check if det is None or empty
+        if det is None or len(det) == 0:
+            return np.array([]), np.array([]), np.array([])
+
+
+        det[:, :4] = self.rescale(img.shape[2:], det[:, :4], im0.shape).round()
 
         # Return bounding boxes, scores, and class ids
-        bboxes = det[:, :5].cpu().numpy() if det is not None else np.array([])
-        class_ids = det[:, 5].cpu().numpy() if det is not None else np.array([])
+        bboxes = det[:, :4].cpu().numpy()
+        scores = det[:, 4].cpu().numpy()
+        class_ids = det[:, 5].cpu().numpy()
         # FPS counter
         # fps_calculator.update(1.0 / (t2 - t1))
         # avg_fps = fps_calculator.accumulate()
 
-        return bboxes, class_ids
+        return bboxes, scores, class_ids
 
 
 
