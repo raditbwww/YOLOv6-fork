@@ -21,7 +21,7 @@ from yolov6.utils.nms import non_max_suppression
 from yolov6.utils.torch_utils import get_model_info
 
 class Inferer:
-    def __init__(self, source, webcam, webcam_addr, weights, device, yaml, img_size, half):
+    def __init__(self, weights, device, yaml, img_size, half):
 
         self.__dict__.update(locals())
 
@@ -49,13 +49,6 @@ class Inferer:
         if self.device.type != 'cpu':
             self.model(torch.zeros(1, 3, *self.img_size).to(self.device).type_as(next(self.model.model.parameters())))  # warmup
 
-        # Load data
-        self.webcam = webcam
-        self.webcam_addr = webcam_addr
-        self.files = LoadData(source, webcam, webcam_addr)
-        self.source = source
-
-
     def model_switch(self, model, img_size):
         ''' Model switch to deploy status '''
         from yolov6.layers.common import RepVGGBlock
@@ -67,96 +60,37 @@ class Inferer:
 
         LOGGER.info("Switch model to deploy modality.")
 
-    def infer(self, conf_thres, iou_thres, classes, agnostic_nms, max_det, save_dir, save_txt, save_img, hide_labels, hide_conf, view_img=True):
-        ''' Model Inference and results visualization '''
-        vid_path, vid_writer, windows = None, None, []
-        fps_calculator = CalcFPS()
-        for img_src, img_path, vid_cap in tqdm(self.files):
-            img, img_src = self.process_image(img_src, self.img_size, self.stride, self.half)
-            img = img.to(self.device)
-            if len(img.shape) == 3:
-                img = img[None]
-                # expand for batch dim
-            t1 = time.time()
-            pred_results = self.model(img)
-            det = non_max_suppression(pred_results, conf_thres, iou_thres, classes, agnostic_nms, max_det=max_det)[0]
-            t2 = time.time()
+    def infer_from_image(self, im0, conf_thres=0.35, iou_thres=0.5, classes=None, agnostic_nms=False, max_det=1000):
+        ''' Inference from a single image frame '''
+        
+        img, img_src = self.process_image(im0, self.img_size, self.stride, self.half)
+        img = img.to(self.device)
+        if len(img.shape) == 3:
+            img = img[None]  # Add batch dimension
 
-            if self.webcam:
-                save_path = osp.join(save_dir, self.webcam_addr)
-                txt_path = osp.join(save_dir, self.webcam_addr)
-            else:
-                # Create output files in nested dirs that mirrors the structure of the images' dirs
-                rel_path = osp.relpath(osp.dirname(img_path), osp.dirname(self.source))
-                save_path = osp.join(save_dir, rel_path, osp.basename(img_path))  # im.jpg
-                txt_path = osp.join(save_dir, rel_path, 'labels', osp.splitext(osp.basename(img_path))[0])
-                os.makedirs(osp.join(save_dir, rel_path), exist_ok=True)
+        # Perform inference
+        pred_results = self.model(img)
+        
+        # Perform NMS (Non-Max Suppression) to filter the results
+        det = non_max_suppression(pred_results, conf_thres, iou_thres, classes, agnostic_nms, max_det=max_det)[0]
+        
+        # Process results
+        if det is not None and len(det):
+            det[:, :4] = self.rescale(img.shape[2:], det[:, :4], im0.shape).round()
 
-            gn = torch.tensor(img_src.shape)[[1, 0, 1, 0]]  # normalization gain whwh
-            img_ori = img_src.copy()
+        # Return bounding boxes, scores, and class ids
+        bboxes = det[:, :4].cpu().numpy() if det is not None else np.array([])
+        scores = det[:, 4].cpu().numpy() if det is not None else np.array([])
+        class_ids = det[:, 5].cpu().numpy() if det is not None else np.array([])
+        # FPS counter
+        # fps_calculator.update(1.0 / (t2 - t1))
+        # avg_fps = fps_calculator.accumulate()
 
-            # check image and font
-            assert img_ori.data.contiguous, 'Image needs to be contiguous. Please apply to input images with np.ascontiguousarray(im).'
-            self.font_check()
+        return bboxes, scores, class_ids
 
-            if len(det):
-                det[:, :4] = self.rescale(img.shape[2:], det[:, :4], img_src.shape).round()
-                for *xyxy, conf, cls in reversed(det):
-                    if save_txt:  # Write to file
-                        xywh = (self.box_convert(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
-                        line = (cls, *xywh, conf)
-                        with open(txt_path + '.txt', 'a') as f:
-                            f.write(('%g ' * len(line)).rstrip() % line + '\n')
 
-                    if save_img:
-                        class_num = int(cls)  # integer class
-                        label = None if hide_labels else (self.class_names[class_num] if hide_conf else f'{self.class_names[class_num]} {conf:.2f}')
 
-                        self.plot_box_and_label(img_ori, max(round(sum(img_ori.shape) / 2 * 0.003), 2), xyxy, label, color=self.generate_colors(class_num, True))
 
-                img_src = np.asarray(img_ori)
-
-            # FPS counter
-            fps_calculator.update(1.0 / (t2 - t1))
-            avg_fps = fps_calculator.accumulate()
-
-            if self.files.type == 'video':
-                self.draw_text(
-                    img_src,
-                    f"FPS: {avg_fps:0.1f}",
-                    pos=(20, 20),
-                    font_scale=1.0,
-                    text_color=(204, 85, 17),
-                    text_color_bg=(255, 255, 255),
-                    font_thickness=2,
-                )
-
-            if view_img:
-                if img_path not in windows:
-                    windows.append(img_path)
-                    cv2.namedWindow(str(img_path), cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO)  # allow window resize (Linux)
-                    cv2.resizeWindow(str(img_path), img_src.shape[1], img_src.shape[0])
-                cv2.imshow(str(img_path), img_src)
-                cv2.waitKey(1)  # 1 millisecond
-
-            # Save results (image with detections)
-            if save_img:
-                if self.files.type == 'image':
-                    cv2.imwrite(save_path, img_src)
-                else:  # 'video' or 'stream'
-                    if vid_path != save_path:  # new video
-                        vid_path = save_path
-                        if isinstance(vid_writer, cv2.VideoWriter):
-                            vid_writer.release()  # release previous video writer
-                        if vid_cap:  # video
-                            fps = vid_cap.get(cv2.CAP_PROP_FPS)
-                            w = int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-                            h = int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-                        else:  # stream
-                            fps, w, h = 30, img_ori.shape[1], img_ori.shape[0]
-                        save_path = str(Path(save_path).with_suffix('.mp4'))  # force *.mp4 suffix on results videos
-                        vid_writer = cv2.VideoWriter(save_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (w, h))
-                    vid_writer.write(img_src)
 
     @staticmethod
     def process_image(img_src, img_size, stride, half):
