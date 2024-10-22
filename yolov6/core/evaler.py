@@ -253,6 +253,7 @@ class Evaler:
                 anno_json = os.path.join(dataset_root, 'annotations', f'instances_{base_name}.json')
             pred_json = os.path.join(self.save_dir, "predictions.json")
             LOGGER.info(f'Saving {pred_json}...')
+            print("pred_results:",pred_results)
             with open(pred_json, 'w') as f:
                 json.dump(pred_results, f)
 
