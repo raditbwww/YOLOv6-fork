@@ -61,6 +61,8 @@ def ap_per_class(tp, conf, pred_cls, target_cls, plot=False, save_dir='.', names
                 if plot and j == 0:
                     py.append(np.interp(px, mrec, mpre))  # precision at mAP@0.5
 
+    print("tpc:",tpc)
+    print("fpc:",fpc)
     # Compute F1 (harmonic mean of precision and recall)
     f1 = 2 * p * r / (p + r + 1e-16)
     if plot:
