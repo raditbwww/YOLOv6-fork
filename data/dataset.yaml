@@ -7,4 +7,4 @@ test: custom_dataset/images/test # test images (optional)
 is_coco: False
 # Classes
 nc: 1  # number of classes
-names: ['catfish']  # class names
+names: ['lele','nila-hitam']  # class names
