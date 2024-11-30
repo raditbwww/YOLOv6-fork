@@ -6,5 +6,5 @@ test: custom_dataset/images/test # test images (optional)
 # whether it is coco dataset, only coco dataset should be set to True.
 is_coco: False
 # Classes
-nc: 1  # number of classes
+nc: 2  # number of classes
 names: ['lele','nila-hitam']  # class names
