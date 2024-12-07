@@ -63,17 +63,30 @@ class Inferer:
     def infer_from_image(self, im0, conf_thres=0.35, iou_thres=0.5, classes=None, agnostic_nms=False, max_det=1000):
         ''' Inference from a single image frame '''
         
+
+        start_time_preprocess = time.time()
         img, img_src = self.process_image(im0, self.img_size, self.stride, self.half)
         img = img.to(self.device)
         if len(img.shape) == 3:
             img = img[None]  # Add batch dimension
+        end_time_preprocess = time.time()
+        preprocess_time = end_time_preprocess - start_time_preprocess
+        print(f"Time taken to do preprocess: {preprocess_time:.3f} seconds")
 
         # Perform inference
+        start_time_pred = time.time()
         pred_results = self.model(img)
+        end_time_pred = time.time()
+        pred_time = end_time_pred - start_time_pred
+        print(f"Time taken to do pred: {pred_time:.3f} seconds")
         
         # Perform NMS (Non-Max Suppression) to filter the results
+        start_time_nms = time.time()
         det = non_max_suppression(pred_results, conf_thres, iou_thres, classes, agnostic_nms, max_det=max_det)[0]
-        
+        end_time_nms = time.time()
+        nms_time = end_time_nms - start_time_nms
+        print(f"Time taken to do nms: {nms_time:.3f} seconds")
+
         # Check if det is None or empty
         if det is None or len(det) == 0:
             print(f"No detections found for current frame")
