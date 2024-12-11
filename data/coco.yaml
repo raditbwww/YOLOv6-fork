@@ -5,10 +5,10 @@
 # train: d:\dataset\coco\images\train2017
 # because windows use "\" as separator, linux use "/" as separator.
 
-train: ../coco/images/train2017 # 118287 images
-val: ../coco/images/val2017  # 5000 images
-test: ../coco/images/test2017
-anno_path: ../coco/annotations/instances_val2017.json
+train: /coco/images/train2017 # 118287 images
+val: /coco/images/val2017  # 5000 images
+test: /coco/images/test2017
+anno_path: /coco/annotations/instances_val2017.json
 
 # number of classes
 nc: 80
@@ -16,12 +16,12 @@ nc: 80
 is_coco: True
 
 # class names
-names: [ 'person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat', 'traffic light',
-         'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow',
-         'elephant', 'bear', 'zebra', 'giraffe', 'backpack', 'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee',
-         'skis', 'snowboard', 'sports ball', 'kite', 'baseball bat', 'baseball glove', 'skateboard', 'surfboard',
-         'tennis racket', 'bottle', 'wine glass', 'cup', 'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple',
-         'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake', 'chair', 'couch',
-         'potted plant', 'bed', 'dining table', 'toilet', 'tv', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone',
-         'microwave', 'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock', 'vase', 'scissors', 'teddy bear',
-         'hair drier', 'toothbrush' ]
+names: ['lele', 'nila-hitam','dummy1', 'dummy2', 'dummy3', 'dummy4', 'dummy5', 'dummy6', 'dummy7', 'dummy8', 'dummy9', 
+          'dummy10', 'dummy11', 'dummy12', 'dummy13', 'dummy14', 'dummy15', 'dummy16', 'dummy17', 'dummy18', 
+          'dummy19', 'dummy20', 'dummy21', 'dummy22', 'dummy23', 'dummy24', 'dummy25', 'dummy26', 'dummy27', 
+          'dummy28', 'dummy29', 'dummy30', 'dummy31', 'dummy32', 'dummy33', 'dummy34', 'dummy35', 'dummy36', 
+          'dummy37', 'dummy38', 'dummy39', 'dummy40', 'dummy41', 'dummy42', 'dummy43', 'dummy44', 'dummy45', 
+          'dummy46', 'dummy47', 'dummy48', 'dummy49', 'dummy50', 'dummy51', 'dummy52', 'dummy53', 'dummy54', 
+          'dummy55', 'dummy56', 'dummy57', 'dummy58', 'dummy59', 'dummy60', 'dummy61', 'dummy62', 'dummy63', 
+          'dummy64', 'dummy65', 'dummy66', 'dummy67', 'dummy68', 'dummy69', 'dummy70', 'dummy71', 'dummy72', 
+          'dummy73', 'dummy74', 'dummy75', 'dummy76', 'dummy77', 'dummy78']
