@@ -189,6 +189,7 @@ class Evaler:
                     self.scale_coords(imgs[si].shape[1:], tbox, shapes[si][0], shapes[si][1])  # native-space labels
 
                     labelsn = torch.cat((labels[:, 0:1], tbox), 1)  # native-space labels
+                    print("labelsn:",labelsn)
 
                     from yolov6.utils.metrics import process_batch
 
@@ -204,10 +205,12 @@ class Evaler:
         if self.do_pr_metric:
             # Compute statistics
             stats = [np.concatenate(x, 0) for x in zip(*stats)]  # to numpy
+            print("stats:",stats)
             if len(stats) and stats[0].any():
 
                 from yolov6.utils.metrics import ap_per_class
                 p, r, ap, f1, ap_class = ap_per_class(*stats, plot=self.plot_curve, save_dir=self.save_dir, names=model.names)
+                print(p, r, ap, f1, ap_class)
                 AP50_F1_max_idx = len(f1.mean(0)) - f1.mean(0)[::-1].argmax() -1
                 LOGGER.info(f"IOU 50 best mF1 thershold near {AP50_F1_max_idx/1000.0}.")
                 ap50, ap = ap[:, 0], ap.mean(1)  # AP@0.5, AP@0.5:0.95
