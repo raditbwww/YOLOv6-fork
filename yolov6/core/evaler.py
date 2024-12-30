@@ -169,9 +169,10 @@ class Evaler:
                     if nl:
                         stats.append((torch.zeros(0, niou, dtype=torch.bool), torch.Tensor(), torch.Tensor(), tcls))
                     continue
-
+                print("stats:",stats)
                 # Predictions
                 predn = pred.clone()
+                print("predn:",predn)
                 self.scale_coords(imgs[si].shape[1:], predn[:, :4], shapes[si][0], shapes[si][1])  # native-space pred
 
                 # Assign all predictions as incorrect
@@ -192,11 +193,13 @@ class Evaler:
                     from yolov6.utils.metrics import process_batch
 
                     correct = process_batch(predn, labelsn, iouv)
+                    print("correct:",correct)
                     if self.plot_confusion_matrix:
                         confusion_matrix.process_batch(predn, labelsn)
 
                 # Append statistics (correct, conf, pcls, tcls)
                 stats.append((correct.cpu(), pred[:, 4].cpu(), pred[:, 5].cpu(), tcls))
+                print("stats:",stats)
 
         if self.do_pr_metric:
             # Compute statistics
