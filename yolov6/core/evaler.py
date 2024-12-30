@@ -216,9 +216,16 @@ class Evaler:
                 print("f1:",f1)
                 print("ap_class:",ap_class)
                 AP50_F1_max_idx = len(f1.mean(0)) - f1.mean(0)[::-1].argmax() -1
+                print("AP50_F1_max_idx:",AP50_F1_max_idx)
                 LOGGER.info(f"IOU 50 best mF1 thershold near {AP50_F1_max_idx/1000.0}.")
                 ap50, ap = ap[:, 0], ap.mean(1)  # AP@0.5, AP@0.5:0.95
+                print("ap50:",ap50)
+                print("ap:",ap)
                 mp, mr, map50, map = p[:, AP50_F1_max_idx].mean(), r[:, AP50_F1_max_idx].mean(), ap50.mean(), ap.mean()
+                print("mp:",mp)
+                print("mr:",mr)
+                print("map50:",map50)
+                print("map:",map)
                 nt = np.bincount(stats[3].astype(np.int64), minlength=model.nc)  # number of targets per class
 
                 # Print results
