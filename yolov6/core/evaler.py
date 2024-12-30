@@ -223,7 +223,9 @@ class Evaler:
                 print("ap:",ap)
                 mp, mr, map50, map = p[:, AP50_F1_max_idx].mean(), r[:, AP50_F1_max_idx].mean(), ap50.mean(), ap.mean()
                 print("mp:",mp)
+                print("mp2:",p.mean())
                 print("mr:",mr)
+                print("mr2:",r.mean())
                 print("map50:",map50)
                 print("map:",map)
                 nt = np.bincount(stats[3].astype(np.int64), minlength=model.nc)  # number of targets per class
