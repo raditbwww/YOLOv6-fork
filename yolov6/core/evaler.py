@@ -153,10 +153,16 @@ class Evaler:
             # Statistics per image
             # This code is based on
             # https://github.com/ultralytics/yolov5/blob/master/val.py
+            print("outputs:",outputs)
+            print("eval_outputs:",eval_outputs)
             for si, pred in enumerate(eval_outputs):
+                print("si:",si)
+                print("pred:",pred)
                 labels = targets[targets[:, 0] == si, 1:]
+                print("labels:",labels)
                 nl = len(labels)
                 tcls = labels[:, 0].tolist() if nl else []  # target class
+                print("tcls:",tcls)
                 seen += 1
 
                 if len(pred) == 0:
