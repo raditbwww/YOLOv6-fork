@@ -320,6 +320,9 @@ class Evaler:
                 mp = np.array([np.mean(coco_p_iou50[ii][coco_p_iou50[ii]>-1]) for ii in range(coco_p_iou50.shape[0])])
                 mr = np.linspace(.0, 1.00, int(np.round((1.00 - .0) / .01)) + 1, endpoint=True)
                 mf1 = 2 * mp * mr / (mp + mr + 1e-16)
+                print("coco mp:",mp)
+                print("coco mr:",mr)
+                print("coco mf1:",mf1)
                 i = mf1.argmax()  # max F1 index
 
                 pf = '%-16s' + '%12i' * 2 + '%12.3g' * 5  # print format
