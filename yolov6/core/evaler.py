@@ -338,6 +338,9 @@ class Evaler:
                     p = coco_p_c_iou50
                     r = np.linspace(.0, 1.00, int(np.round((1.00 - .0) / .01)) + 1, endpoint=True)
                     f1 = 2 * p * r / (p + r + 1e-16)
+                    print("coco p:",p)
+                    print("coco r:",m)
+                    print("coco f1:",f1)
                     i = f1.argmax()
                     LOGGER.info(pf % (model.names[nc_i], len(label_count_dicts[nc_i]["images"]), label_count_dicts[nc_i]["anns"], p[i], r[i], f1[i], map50, map))
             cocoEval.summarize()
