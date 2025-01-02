@@ -307,7 +307,11 @@ class Evaler:
                     nc_i = self.coco80_to_coco91_class().index(ann_i['category_id']) if self.is_coco else ann_i['category_id']
                     label_count_dicts[nc_i]["images"].add(ann_i["image_id"])
                     label_count_dicts[nc_i]["anns"] += 1
-
+                    print("nc_i:",nc_i)
+                    print("label_count_dicts",label_count_dicts)
+                print("nc_i:",nc_i)
+                print("label_count_dicts",label_count_dicts)
+                
                 s = ('%-16s' + '%12s' * 7) % ('Class', 'Labeled_images', 'Labels', 'P@.5iou', 'R@.5iou', 'F1@.5iou', 'mAP@.5', 'mAP@.5:.95')
                 LOGGER.info(s)
                 #IOU , all p, all cats, all gt, maxdet 100
